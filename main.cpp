@@ -98,7 +98,7 @@ struct GraphWindow : public GraphicInterface::Window
                 delete[] image;
             };
 
-            if( input.scale || input.init )
+            if( input.scale || input.init || input.typed )
             {
                 update();
                 return true;
