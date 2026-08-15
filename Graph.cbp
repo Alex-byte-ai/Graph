@@ -48,7 +48,6 @@
 					<Add option="-D_UNICODE" />
 					<Add option="-DUNICODE" />
 					<Add option="-D_DEBUG" />
-					<Add directory="../../Utilities" />
 					<Add directory="../Utilities" />
 					<Add directory="../Zlib-1.3.1" />
 					<Add directory="../Zlib-1.3.1-additional" />
@@ -112,7 +111,6 @@
 					<Add option="-DMEMORY_MANAGEMENT=1" />
 					<Add option="-D_UNICODE" />
 					<Add option="-DUNICODE" />
-					<Add directory="../../Utilities" />
 					<Add directory="../Utilities" />
 					<Add directory="../Zlib-1.3.1" />
 					<Add directory="../Zlib-1.3.1-additional" />
@@ -153,6 +151,8 @@
 		<Unit filename="../Utilities/Basic.h" />
 		<Unit filename="../Utilities/Clipboard.cpp" />
 		<Unit filename="../Utilities/Clipboard.h" />
+		<Unit filename="../Utilities/CommandLineArguments.cpp" />
+		<Unit filename="../Utilities/CommandLineArguments.h" />
 		<Unit filename="../Utilities/Curve.cpp" />
 		<Unit filename="../Utilities/Curve.h" />
 		<Unit filename="../Utilities/Exception.cpp" />
@@ -181,8 +181,10 @@
 		<Unit filename="../Utilities/UnicodeString.h" />
 		<Unit filename="../Utilities/Window.cpp" />
 		<Unit filename="../Utilities/Window.h" />
-		<Unit filename="CommandLineArguments.cpp" />
-		<Unit filename="CommandLineArguments.h" />
+		<Unit filename="../Utilities/resource.h" />
+		<Unit filename="../Utilities/resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="Graph.cpp" />
 		<Unit filename="Graph.h" />
 		<Unit filename="main.cpp" />

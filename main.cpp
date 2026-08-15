@@ -1,12 +1,12 @@
 #include <filesystem>
 #include <optional>
 
+#include "CommandLineArguments.h"
 #include "Image/Translate.h"
 #include "Clipboard.h"
 #include "Window.h"
 #include "Basic.h"
 
-#include "CommandLineArguments.h"
 #include "Graph.h"
 
 static void Input( Graph& graph )
@@ -79,7 +79,7 @@ struct GraphWindow : public GraphicInterface::Window
 
         handleMsg = [this]( const GraphicInterface::InputData & input, GraphicInterface::OutputData & output )
         {
-            auto& keyL = input.keys.letter( 'L' );
+            auto& keyO = input.keys.letter( 'O' );
             auto& keyS = input.keys.letter( 'S' );
             auto& keyT = input.keys.letter( 'T' );
             auto& keyC = input.keys.letter( 'C' );
@@ -195,7 +195,7 @@ struct GraphWindow : public GraphicInterface::Window
 
             if( *input.ctrl )
             {
-                if( *keyL && keyL.changed() )
+                if( *keyO && keyO.changed() )
                 {
                     Input( graph );
                     lmb = rmb = mmb = nullptr;
@@ -213,7 +213,7 @@ struct GraphWindow : public GraphicInterface::Window
                     update();
                     return true;
                 }
-                if( *keyC && keyC.changed() )
+                if( rmb && *keyC && keyC.changed() )
                 {
                     ImageConvert::Reference image;
                     image.reset = []( ImageConvert::Reference & )
@@ -231,49 +231,52 @@ struct GraphWindow : public GraphicInterface::Window
                     Clipboard::output( item );
                     return true;
                 }
-                if( *keyV && keyV.changed() )
+                if( rmb && *keyV && keyV.changed() )
                 {
                     Clipboard::Item item;
                     Clipboard::input( item );
                     if( auto image = std::get_if<ImageConvert::Reference>( &item ) )
                     {
-                        if( rmb )
+                        ImageConvert::Reference p;
+                        p.reset = [this]( ImageConvert::Reference & ref )
                         {
-                            ImageConvert::Reference p;
-                            p.reset = [this]( ImageConvert::Reference & ref )
+                            if( ref.bytes > 0 )
                             {
-                                if( ref.bytes > 0 )
-                                {
-                                    rmb->image.resize( ( ref.bytes + 3 ) / 4 );
-                                    rmb->w = ref.w;
-                                    rmb->h = ref.h;
-                                    ref.link = rmb->image.data();
-                                }
-                                else
-                                {
-                                    ref.link = nullptr;
-                                }
-                                return true;
-                            };
-                            p.clear = []( ImageConvert::Reference & )
-                            {};
-                            p.format = "B8G8R8A8*REPBG*REPRG*REPA255";
-                            ImageConvert::translate( *image, p, false );
-                            if( rmb->h < 0 )
-                            {
-                                auto link = rmb->image.data();
-                                auto h = -rmb->h;
-                                auto hh = h / 2;
-                                auto w = rmb->w;
-                                auto bytes = w * sizeof( rmb->image[0] );
-                                rmb->h = h;
-
-                                for( int i = 0; i < hh; ++i )
-                                    swap( link + ( i * w ), link + ( ( h - i - 1 ) * w ), bytes );
+                                rmb->image.resize( ( ref.bytes + 3 ) / 4 );
+                                rmb->w = ref.w;
+                                rmb->h = ref.h;
+                                ref.link = rmb->image.data();
                             }
-                            update();
+                            else
+                            {
+                                ref.link = nullptr;
+                            }
                             return true;
+                        };
+                        p.clear = []( ImageConvert::Reference & )
+                        {};
+                        p.format = "B8G8R8A8*REPBG*REPRG*REPA255";
+                        ImageConvert::translate( *image, p, false );
+                        if( rmb->h < 0 )
+                        {
+                            auto link = rmb->image.data();
+                            auto h = -rmb->h;
+                            auto hh = h / 2;
+                            auto w = rmb->w;
+                            auto bytes = w * sizeof( rmb->image[0] );
+                            rmb->h = h;
+
+                            for( int i = 0; i < hh; ++i )
+                                swap( link + ( i * w ), link + ( ( h - i - 1 ) * w ), bytes );
                         }
+                        update();
+                        return true;
+                    }
+                    if( auto text = std::get_if<std::wstring>( &item ) )
+                    {
+                        rmb->text += *text;
+                        update();
+                        return true;
                     }
                 }
             }
