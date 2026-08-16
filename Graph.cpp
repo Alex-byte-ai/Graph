@@ -194,7 +194,24 @@ void Graph::Node::draw( uint32_t *pixels, int width, int height )
             for( int j = x; j < x + w; ++j )
             {
                 if( 0 <= j && j < width && 0 <= i && i < height )
-                    pixels[i * width + j] = image[( i - y ) * w + ( j - x )];
+                {
+                    auto& input = image[( i - y ) * w + ( j - x )];
+                    auto inA = ( input >> 24 ) & 0xff;
+                    auto inR = ( input >> 16 ) & 0xff;
+                    auto inG = ( input >> 8 ) & 0xff;
+                    auto inB = input & 0xff;
+
+                    auto& output = pixels[i * width + j];
+                    auto outR = ( output >> 16 ) & 0xff;
+                    auto outG = ( output >> 8 ) & 0xff;
+                    auto outB = output & 0xff;
+
+                    auto revA = 255 - inA;
+                    outR = ( revA * outR + inA * inR ) / 255;
+                    outG = ( revA * outG + inA * inG ) / 255;
+                    outB = ( revA * outB + inA * inB ) / 255;
+                    output = ( 0xff << 24 ) | ( outR << 16 ) | ( outG << 8 ) | outB;
+                }
             }
         }
         return;
