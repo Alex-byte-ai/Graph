@@ -215,19 +215,25 @@ struct GraphWindow : public GraphicInterface::Window
                 }
                 if( rmb && *keyC && keyC.changed() )
                 {
-                    ImageConvert::Reference image;
-                    image.reset = []( ImageConvert::Reference & )
+                    if( !rmb->image.empty() )
                     {
-                        return false;
-                    };
-                    image.clear = []( ImageConvert::Reference & )
-                    {};
-                    image.format = "B8G8R8A8";
-                    image.w = rmb->w;
-                    image.h = rmb->h;
-                    image.link = rmb->image.data();
-                    image.bytes = image.w * image.h * sizeof( rmb->image[0] );
-                    Clipboard::Item item = std::move( image );
+                        ImageConvert::Reference image;
+                        image.reset = []( ImageConvert::Reference & )
+                        {
+                            return false;
+                        };
+                        image.clear = []( ImageConvert::Reference & )
+                        {};
+                        image.format = "B8G8R8A8";
+                        image.w = rmb->w;
+                        image.h = rmb->h;
+                        image.link = rmb->image.data();
+                        image.bytes = image.w * image.h * sizeof( rmb->image[0] );
+                        Clipboard::Item item = std::move( image );
+                        Clipboard::output( item );
+                        return true;
+                    }
+                    Clipboard::Item item = rmb->text;
                     Clipboard::output( item );
                     return true;
                 }
